@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <import type="com.example.kevin.jakarta.dummy.MusicContent.MusicItem"/>
+
+        <import type="com.example.kevin.jakarta.online.ListAdapter"/>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="item"
+            type="MusicItem"/>
+
+        <variable
+            name="adapter"
+            type="ListAdapter"/>
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/list_background_selector"
+        android:onClick="@{() -> adapter.downloadSubject.onNext(item)}"
+        android:padding="5dp">
+
+        <ImageView
+            android:id="@+id/imgThumb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/ic_launcher"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:layout_toEndOf="@+id/imgThumb"
+            android:gravity="center|start"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvName"
+                style="@style/list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@{item.name()}"/>
+
+            <TextView
+                style="@style/list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:gravity="center"
+                android:text="@{item.author()}"
+                android:visibility="@{item.type() == item.type().NONE ? View.GONE :View.VISIBLE }"/>
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</layout>

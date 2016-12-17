@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <import type="com.example.kevin.jakarta.dummy.MusicContent.MusicItem"/>
+
+        <import type="com.example.kevin.jakarta.type.MusicTypeAdapter"/>
+
+        <import type="com.example.kevin.jakarta.type.MusicTypeAdapter.ViewHolder"/>
+
+        <variable
+            name="item"
+            type="MusicItem"/>
+
+        <variable
+            name="adapter"
+            type="MusicTypeAdapter"/>
+
+        <variable
+            name="holder"
+            type="ViewHolder"/>
+    </data>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerInParent="true"
+            android:alpha="0.8"
+            android:onClick='@{() -> adapter.switchTypeControl(item,holder)}'
+            android:src="@drawable/video_pre"/>
+
+    </RelativeLayout>
+
+</layout>
