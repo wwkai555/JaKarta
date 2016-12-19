@@ -67,6 +67,7 @@ public class MusicClipFragment extends Fragment {
         adapter.setDurationMSPerBar(durationMSPer);
         String path = clipMusicInfo.item().type() == MusicContent.MusicType.ONLINE ? clipMusicInfo.item().url() : clipMusicInfo.item().path();
         adapter.test(path);
+//        adapter.setInput(path);
         clipBinding.rcyVolume.setAdapter(adapter);
         clipBinding.rcyVolume.addOnScrollListener(new ScrollListener(clipBinding));
         clipBinding.rcyVolume.setLayoutManager(new LinearLayoutManager(this.getContext(), LinearLayoutManager.HORIZONTAL, false));

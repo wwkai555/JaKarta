@@ -22,6 +22,7 @@ public class DummyData {
     public static List<MusicContent.MusicItem> list(String categoryID) {
         List<MusicContent.MusicItem> list = new ArrayList<>();
         MusicContent.MusicItem none = MusicContent.MusicItem.builder().id(0)
+                .thumbUrl("http://img.hb.aicdn.com/dfc20e76e2508f859ed5c231f373cd62049a52399c685f-dAHfzp_fw658")
                 .name("无音乐").author("none").duration(0).type(MusicContent.MusicType.NONE)
                 .build();
         list.add(none);
@@ -30,6 +31,7 @@ public class DummyData {
                     .name(String.format("分类%s ： 歌曲%s", categoryID, i)).author("china voice")
                     .duration(i * 5000).type(MusicContent.MusicType.ONLINE)
                     .url("http://ac-oi06foci.clouddn.com/e1a02f525a09e9858f2f.m4a")
+                    .thumbUrl("http://img.hb.aicdn.com/dfc20e76e2508f859ed5c231f373cd62049a52399c685f-dAHfzp_fw658")
                     .build();
             list.add(item);
         }

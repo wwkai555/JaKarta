@@ -1,11 +1,15 @@
 package com.example.kevin.jakarta.online;
 
+import android.databinding.BindingAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.example.kevin.jakarta.databinding.ItemListOnlineMusicBinding;
 import com.example.kevin.jakarta.dummy.MusicContent;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +41,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     public void list(List<MusicContent.MusicItem> itemList) {
         this.itemList.clear();
         this.itemList.addAll(itemList);
+    }
+
+    @BindingAdapter("src")
+    public static void loadImage(View view, String url) {
+        Picasso.with(view.getContext()).load(url).into((ImageView) view);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
