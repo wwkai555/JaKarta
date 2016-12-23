@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -179,32 +181,37 @@ public class VolumeAdapter extends RecyclerView.Adapter<VolumeAdapter.ViewHolder
         });
     }
 
-    public void test(String path) {
-        final AEDecoder decoder = AEDecoder.fromPath(path, 1, 1);
-        if (null == decoder)
-            if (Spec.debug)
-                throw new RuntimeException("Could not read audio file from " + path);
-        Observable.just(decoder).map(new Func1<AEDecoder, List<Item>>() {
-            @Override public List<Item> call(AEDecoder aeDecoder) {
+    //for test
+    public void test(final String path) {
+        Observable.create(new Observable.OnSubscribe<AEDecoder>() {
+            @Override public void call(Subscriber<? super AEDecoder> subscriber) {
+                subscriber.onNext(AEDecoder.fromPath(path, 1, 1));
+            }
+        }).map(new Func1<AEDecoder, Pair<AEDecoder, List<Item>>>() {
+            @Override public Pair<AEDecoder, List<Item>> call(AEDecoder aeDecoder) {
+                if (null == aeDecoder)
+                    if (Spec.debug)
+                        throw new RuntimeException("Could not read audio file from " + path);
                 aeDecoder.setOutput(new AEDecoderOutput());
-                long aLong = decoder.getDurationUs();
+                long aLong = aeDecoder.getDurationUs();
                 Log.d("VolumeAdapter", "durationMS : " + aLong / 1e3);
                 int count = (int) (aLong / Spec.durationUSPerBar);
                 List<Item> items = new ArrayList<>(count);
                 for (int i = 0; i < count; i++) items.add(new Item(Spec.durationUSPerBar * i));
-                return unmodifiableList(items);
+                return new Pair<>(aeDecoder, unmodifiableList(items));
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<List<Item>>() {
-                    @Override public void call(List<Item> list) {
-                        VolumeAdapter.this.items = list;
+                .subscribe(new Action1<Pair<AEDecoder, List<Item>>>() {
+                    @Override public void call(final Pair<AEDecoder, List<Item>> pair) {
+                        VolumeAdapter.this.items = pair.second;
                         notifyDataSetChanged();
                         AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
                             @Override public void run() {
-                                while (decoder.decodeFrame() == 0) ;
+                                while (pair.first.decodeFrame() == 0) ;
                             }
                         });
                     }
                 });
     }
+
 }

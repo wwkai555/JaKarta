@@ -3,7 +3,6 @@ package com.example.kevin.jakarta.dummy;
 import android.content.Context;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.view.View;
 
 import com.dxm.rxbinder.annotations.RxBind;
 import com.google.auto.value.AutoValue;
@@ -34,23 +33,10 @@ public class MusicContent {
         return items;
     }
 
-//    private static MusicItem NoneMusicItem() {
-//        MusicItem none = new MusicItem();
-//        none.type = MusicType.NONE;
-//        return none;
-//    }
-
     @RxBind static List<MusicItem> attachOnlineMusicTag(List<MusicItem> items) {
         items.add(MusicItem.builder().type(MusicType.ONLINE).id(1).build());
         return items;
     }
-
-//    private static MusicItem OnlineMusicItem() {
-//        MusicItem onlineTag = new MusicItem();
-//        onlineTag.type = MusicType.ONLINE;
-//        onlineTag.thumbUrl = "";
-//        return onlineTag;
-//    }
 
     @RxBind static List<MusicItem> attachOfflineMusicTag(List<MusicItem> items) {
         List<MusicItem> offlineItems = new ArrayList<>();
@@ -60,12 +46,6 @@ public class MusicContent {
 //        items.addAll(offlineItems);
         return items;
     }
-
-//    private static List<MusicItem> offlineMusicList() {
-//        List<MusicItem> offlineItems = new ArrayList<>();
-//        // load cache music
-//        return offlineItems;
-//    }
 
     @AutoValue public static abstract class MusicItem implements Parcelable {
         public abstract int id();
@@ -78,15 +58,17 @@ public class MusicContent {
 
         @NonNull public abstract MusicType type();
 
-        public abstract String url();
+        @NonNull public abstract String url();
 
         public abstract String thumbUrl();
+
+        public abstract String lyricUrl();
 
         public abstract long duration();
 
         public static Builder builder() {
-            return new AutoValue_MusicContent_MusicItem.Builder().id(0).name("default").author("default")
-                    .path("").type(MusicType.NONE).duration(0).url("").thumbUrl("");
+            return new AutoValue_MusicContent_MusicItem.Builder().id(0).name("NONE").author("NONE")
+                    .path("NONE").type(MusicType.NONE).duration(0).url("NONE").thumbUrl("NONE").lyricUrl("NONE");
         }
 
         @AutoValue.Builder public static abstract class Builder {
@@ -105,6 +87,8 @@ public class MusicContent {
             public abstract Builder duration(long duration);
 
             public abstract Builder thumbUrl(String thumbUrl);
+
+            public abstract Builder lyricUrl(String lyricUrl);
 
             public abstract MusicItem build();
         }

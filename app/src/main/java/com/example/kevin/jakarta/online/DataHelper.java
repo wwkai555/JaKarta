@@ -2,11 +2,13 @@ package com.example.kevin.jakarta.online;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.util.Pair;
 
+import com.dxm.rxbinder.annotations.Partial;
 import com.dxm.rxbinder.annotations.RxBind;
+import com.example.kevin.jakarta.Utils.CacheUtil;
 import com.example.kevin.jakarta.common.Constance;
 import com.example.kevin.jakarta.common.EmptySubscriber;
-import com.example.kevin.jakarta.Utils.CacheUtil;
 import com.example.kevin.jakarta.dummy.DummyData;
 import com.example.kevin.jakarta.dummy.MusicContent;
 
@@ -14,6 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -52,10 +55,10 @@ public class DataHelper {
     }
 
     //3.2 请求在线 分类音乐列表
-    private void requestOnlineList(final String classifyId, final String dir) {
-        Observable.just(new MusicHttpClient().requestList(classifyId))
+    private void requestOnlineList(final String classifyId) {
+        Observable.just(MusicHttpClient.getInstance().requestList(classifyId))
                 .doOnNext(cacheList(classifyId))
-                .map(parserItemsData(dir))
+                .map(parserItemsData())
                 .subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new EmptySubscriber<List<MusicContent.MusicItem>>() {
                     @Override public void onError(Throwable e) {
@@ -76,8 +79,8 @@ public class DataHelper {
         };
     }
 
-    private void requestCacheList(final String id, final String dir) {
-        Observable.just(listCache(id)).map(parserItemsData(dir)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+    private void requestCacheList(final String id) {
+        Observable.just(listCache(id)).map(parserItemsData()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new EmptySubscriber<List<MusicContent.MusicItem>>() {
                     @Override public void onError(Throwable e) {
                         listSubject.onError(e);
@@ -85,12 +88,12 @@ public class DataHelper {
 
                     @Override public void onNext(List<MusicContent.MusicItem> o) {
                         listSubject.onNext(o);
-                        requestOnlineList(id, dir);
+                        requestOnlineList(id);
                     }
                 });
     }
 
-    private Func1<String, List<MusicContent.MusicItem>> parserItemsData(final String dir) {
+    private Func1<String, List<MusicContent.MusicItem>> parserItemsData() {
         return new Func1<String, List<MusicContent.MusicItem>>() {
             @Override public List<MusicContent.MusicItem> call(String s) {
                 try {
@@ -136,7 +139,7 @@ public class DataHelper {
 
     //3.1 请求在线 音乐分类数据
     private void requestOnlineCategory() {
-        Observable.just(new MusicHttpClient().requestCategory())
+        Observable.just(MusicHttpClient.getInstance().requestCategory())
                 .doOnNext(cacheCategory())
                 .map(DataHelperBindings.parserClassifyData(this))
                 .subscribeOn(Schedulers.io())
@@ -207,12 +210,13 @@ public class DataHelper {
 
     public void downloadMusic(@NonNull MusicContent.MusicItem musicItem) {
         downloadSubject.onNext(musicItem);
-  /*      final MusicContent.MusicItem item = musicItem;
-        if (new File(item.path()).exists()) {
+        final MusicContent.MusicItem item = musicItem;
+        /*if (new File(CacheUtil.getMusicCachePath(musicItem.url())).exists()) {
             downloadSubject.onNext(item);
             return;
         }
-        Observable.just(new MusicHttpClient().download(item.url())).map(cacheData(item)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+        Observable.just(musicItem).map(DataHelperBindings.download(this)).map(DataHelperBindings.cacheData(this, musicItem))
+                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new EmptySubscriber<MusicContent.MusicItem>() {
                     @Override public void onError(Throwable e) {
                         downloadSubject.onError(e);
@@ -224,31 +228,28 @@ public class DataHelper {
                 });*/
     }
 
-    private Func1<byte[], MusicContent.MusicItem> cacheData(final MusicContent.MusicItem item) {
-        return new Func1<byte[], MusicContent.MusicItem>() {
-            @Override public MusicContent.MusicItem call(byte[] bytes) {
-                try {
-                    OutputStream outputStream = new FileOutputStream(item.path());
-                    outputStream.write(bytes);
-                    outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                cacheMusicItem(item);
-                return item;
-            }
-        };
+    @RxBind Pair<byte[], byte[]> download(MusicContent.MusicItem item) {
+        byte[] musicData = MusicHttpClient.getInstance().download(item.url());
+        byte[] lyricData = MusicHttpClient.getInstance().download(item.lyricUrl());
+        return new Pair<>(musicData, lyricData);
     }
 
-    /**
-     * 缓存单个音乐到 音乐列表，用于其它地方导出已下载音乐文本数据
-     */
-    private void cacheMusicItem(MusicContent.MusicItem item) {
+    @RxBind MusicContent.MusicItem cacheData(Pair<byte[], byte[]> pair, @Partial MusicContent.MusicItem item) {
+        try {
+            OutputStream outMusicStream = new FileOutputStream(CacheUtil.getMusicCachePath(item.url()));
+            OutputStream outLyricStream = new FileOutputStream(CacheUtil.getMusicLyricPath(item.lyricUrl()));
+
+            outMusicStream.write(pair.first);
+            outLyricStream.write(pair.second);
+            outMusicStream.close();
+            outLyricStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         String cacheList = CacheUtil.getInstance().getString(Constance.DOWNLOAD_MUSIC_LIST);
         com.alibaba.fastjson.JSONArray list = com.alibaba.fastjson.JSONArray.parseArray(cacheList);
         list.add(item);
         CacheUtil.getInstance().putString(Constance.DOWNLOAD_MUSIC_LIST, list.toJSONString());
+        return item;
     }
-
-
 }

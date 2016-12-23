@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
     <data>
 
         <variable
@@ -15,10 +16,11 @@
         <com.example.kevin.jakarta.clip.VerticalProgressBar
             android:id="@+id/view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:progress_foreground="@{0xff000000}"
-            android:progress="@{item.volume}"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:background="@android:color/transparent"
+            android:progress="@{item.volume}"
+            android:progress_foreground="@{0xff000000}"
             />
 
     </FrameLayout>

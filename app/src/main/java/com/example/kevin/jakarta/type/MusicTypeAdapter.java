@@ -44,11 +44,7 @@ public class MusicTypeAdapter extends RecyclerView.Adapter<MusicTypeAdapter.View
         holder.itemBinding.setAdapter(this);
         holder.itemBinding.setItem(mValues.get(position));
         holder.itemBinding.setHolder(holder);
-        if (key == position) {
-            AnimationUtil.scaleAnimation(1.2f, 200, 1f, holder.itemView);
-        } else {
-            AnimationUtil.scaleAnimation(1.0f, 0, 0.8f, holder.itemView);
-        }
+        AnimationUtil.scaleAnimation(key == position ? 1.2f : 1.0f, key == position ? 200 : 0, 1f, holder.itemView);
     }
 
     @Override
@@ -59,8 +55,8 @@ public class MusicTypeAdapter extends RecyclerView.Adapter<MusicTypeAdapter.View
     public void switchTypeControl(MusicItem item, ViewHolder holder) {
         Log.d("MusicRecyclerView", "getLayoutPosition : " + holder.getLayoutPosition());
         key = holder.getLayoutPosition();
-        notifyDataSetChanged();
         publishSubject.onNext(new Pair<>(holder.getLayoutPosition(), item));
+        notifyDataSetChanged();
     }
 
     public void updateKeyPosition(int key) {

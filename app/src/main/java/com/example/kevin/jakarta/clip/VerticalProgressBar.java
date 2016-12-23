@@ -56,7 +56,8 @@ public class VerticalProgressBar extends View {
             final int parentHeight = getHeight();
             int width = parentWidth;
             int height = (int) (parentHeight * progress);
-            foreground.setBounds(0, parentHeight - height, width, parentHeight);
+            int offset = (parentHeight - height) / 2;
+            foreground.setBounds(0, offset, width, parentHeight - offset);
             foreground.draw(canvas);
         }
     }

@@ -1,17 +1,29 @@
 package com.example.kevin.jakarta.online;
 
-import rx.Observable;
-
 /**
  * Created by kevin on 16-12-14.
  */
 
 public class MusicHttpClient {
 
-    public String requestCategory(){
+    private static MusicHttpClient httpClient;
+
+    private MusicHttpClient() {
+    }
+
+    public static synchronized MusicHttpClient getInstance() {
+        if (httpClient == null) {
+            httpClient = new MusicHttpClient();
+        }
+        return httpClient;
+    }
+
+
+    public String requestCategory() {
         return null;
     }
-    public String requestList(String categoryID){
+
+    public String requestList(String categoryID) {
         return null;
     }
 
