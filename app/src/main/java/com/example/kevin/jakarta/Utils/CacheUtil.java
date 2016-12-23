@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
+import org.apache.commons.codec.digest.Md5Crypt;
+
 /**
  * Created by kevin on 16-12-14.
  */
@@ -12,6 +14,7 @@ public class CacheUtil {
     private static final String KEY = "JaKarTa";
     private SharedPreferences preferences;
     private static CacheUtil cacheUtil;
+    private static String MUSIC_CACHE_DIR;
 
     public static synchronized CacheUtil getInstance() {
         if (cacheUtil == null) {
@@ -23,8 +26,9 @@ public class CacheUtil {
     private CacheUtil() {
     }
 
-    public void init(@NonNull Context ctx) {
+    public void init(Context ctx) {
         preferences = ctx.getSharedPreferences(KEY, Context.MODE_PRIVATE);
+        MUSIC_CACHE_DIR = FileUtil.getMusicDir(ctx).getAbsolutePath();
     }
 
     public void putString(@NonNull String key, @NonNull String result) {
@@ -51,6 +55,14 @@ public class CacheUtil {
         } else {
             return false;
         }
+    }
+
+    public static String getMusicCachePath(String url) {
+        return MUSIC_CACHE_DIR + "/" + Md5Crypt.apr1Crypt(url) + ".mp3";
+    }
+
+    public static String getMusicLyricPath(String url) {
+        return MUSIC_CACHE_DIR + "/" + url.hashCode() + ".lrc";
     }
 
 }

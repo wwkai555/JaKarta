@@ -1,5 +1,7 @@
 package com.example.kevin.jakarta.dummy;
 
+import android.content.Context;
+
 import com.example.kevin.jakarta.online.CategoryInfo;
 
 import java.util.ArrayList;
@@ -17,7 +19,6 @@ public class DummyData {
         }
         return list;
     }
-
 
     public static List<MusicContent.MusicItem> list(String categoryID) {
         List<MusicContent.MusicItem> list = new ArrayList<>();
@@ -37,4 +38,9 @@ public class DummyData {
         }
         return list;
     }
+
+
+//    public static List<MusicContent.MusicItem> localList(Context context) {
+//        context.getAssets().open("lyric.lrc");
+//    }
 }
